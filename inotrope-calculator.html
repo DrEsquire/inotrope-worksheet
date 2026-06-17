@@ -84,7 +84,7 @@
 
   <div class="field">
     <label>Bag Change Schedule:</label>
-    <input type="number" id="bagHours" step="1" oninput="calculate()">
+    <input type="number" id="bagHours" step="1" oninput="calculate()" value="48">
     <span class="unit">hours</span>
   </div>
 
@@ -259,7 +259,7 @@ function setupPrivacy() {
 }
 
 function resetAll() {
-  ['dose', 'weight', 'bagHours', 'overfill', 'concentration', 'patient'].forEach(id => {
+  ['dose', 'weight', 'overfill', 'concentration', 'patient'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.value = id === 'overfill' ? '15' : '';
@@ -270,8 +270,6 @@ function resetAll() {
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
-  const bh = document.getElementById('bagHours');
-  if (bh && drug) bh.value = bagHoursDefaults[drug.value] || '';
   setToday();
   calculate();
 }
@@ -296,8 +294,6 @@ function drugChanged() {
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
-  const bh = document.getElementById('bagHours');
-  if (bh && drug) bh.value = bagHoursDefaults[drug.value] || '';
   calculate();
 }
 
