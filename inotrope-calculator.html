@@ -290,6 +290,9 @@ function drugChanged() {
   const drug = document.getElementById('drug');
   const concEl = document.getElementById('concentration');
   if (drug && concEl) {
+    Array.from(concEl.options).forEach(option => {
+      option.style.display = option.dataset.drug === drug.value ? '' : 'none';
+    });
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
