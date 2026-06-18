@@ -11,6 +11,8 @@
   .field { margin: 8px 0; }
   label { display: inline-block; width: 240px; font-weight: bold; color: #555; }
   input[type="text"], input[type="number"] { padding: 6px; border: 1px solid #ddd; border-radius: 4px; width: 200px; font-size: 14px; }
+  input.dose-yes { background-color: #e8f5e9; border-color: #43a047; }
+  input.dose-no { background-color: #ffebee; border-color: #c62828; }
   .result { background: #ecf0f1; padding: 6px 10px; border-radius: 4px; font-weight: bold; min-width: 120px; display: inline-block; }
   .unit { color: #7f8c8d; font-size: 12px; margin-left: 4px; }
   .section-title { background: #3498db; color: white; padding: 8px 12px; border-radius: 4px; margin-top: 15px; font-weight: bold; }
@@ -28,6 +30,7 @@
   th, td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 13px; }
   th { background: #3498db; color: white; }
   .date-display { font-size: 14px; color: #555; margin-bottom: 15px; }
+  .dose-alert { color: #c0392b; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -74,6 +77,7 @@
     <label>Hospital Dose:</label>
     <input type="number" id="dose" step="0.1" oninput="calculate()">
     <span class="unit">mcg/kg/min</span>
+    <span id="doseAlert" class="unit" aria-live="polite"></span>
   </div>
   
   <div class="field">
@@ -312,6 +316,31 @@ function calculate() {
     const bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
     const overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
     const conc_mg_ml = concEl ? parseFloat(concEl.value) || 0 : 0;
+
+    const doseAlertEl = document.getElementById('doseAlert');
+    const doseRanges = {
+      dobutamine: { min: 2, max: 5 },
+      milrinone: { min: 0.125, max: 0.5 }
+    };
+    if (doseAlertEl) {
+      const value = doseEl && doseEl.value !== '' ? parseFloat(doseEl.value) : NaN;
+      const range = value === value && doseRanges[drug] ? doseRanges[drug] : null;
+      if (range && !Number.isNaN(value)) {
+        if (value < range.min || value > range.max) {
+          doseAlertEl.textContent = 'Outside usual adult range: ' + range.min + '-' + range.max + ' mcg/kg/min';
+          doseAlertEl.className = 'unit dose-alert';
+          if (doseEl) doseEl.className = 'dose-no';
+        } else {
+          doseAlertEl.textContent = 'Within usual adult range';
+          doseAlertEl.className = 'unit';
+          if (doseEl) doseEl.className = 'dose-yes';
+        }
+      } else if (doseEl && doseEl.value === '') {
+        doseAlertEl.textContent = '';
+        doseAlertEl.className = 'unit';
+        if (doseEl) doseEl.className = '';
+      }
+    }
 
     if (!conc_mg_ml && concEl && drugDefaults[drug]) {
       const target = Array.from(concEl.options).find(option => option.dataset.drug === drug);
