@@ -363,6 +363,14 @@ function drugChanged() {
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
+  const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
+  if (mode && mode.value === 'no') {
+    const reverseConcEl = document.getElementById('reverseConc');
+    if (reverseConcEl && drug) {
+      const target = Array.from(reverseConcEl.options).find(option => option.dataset.drug === drug.value);
+      if (target) reverseConcEl.value = String(target.value);
+    }
+  }
   calculate();
 }
 
