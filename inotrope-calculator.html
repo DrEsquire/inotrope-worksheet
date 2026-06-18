@@ -31,6 +31,8 @@
   th { background: #3498db; color: white; }
   .date-display { font-size: 14px; color: #555; margin-bottom: 15px; }
   .dose-alert { color: #c0392b; font-weight: bold; }
+  .hidden { display: none; }
+  .radio-group label { margin-right: 12px; font-weight: normal; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -74,16 +76,57 @@
   <h2>Dosing Parameters</h2>
   
   <div class="field">
-    <label>Hospital Dose:</label>
-    <input type="number" id="dose" step="0.1" oninput="calculate()">
-    <span class="unit">mcg/kg/min</span>
-    <span id="doseAlert" class="unit" aria-live="polite"></span>
+    <label>Dose Weight Provided:</label>
+    <span class="radio-group">
+      <label><input type="radio" name="doseWeightProvided" value="yes" onchange="doseWeightModeChanged()" checked> Yes</label>
+      <label><input type="radio" name="doseWeightProvided" value="no" onchange="doseWeightModeChanged()"> No</label>
+    </span>
   </div>
-  
-  <div class="field">
-    <label>Patient Dosing Weight:</label>
-    <input type="number" id="weight" step="0.1" oninput="calculate()">
-    <span class="unit">kg</span>
+
+  <div id="directDoseWeightSection">
+    <div class="field">
+      <label>Hospital Dose:</label>
+      <input type="number" id="dose" step="0.1" oninput="calculate()">
+      <span class="unit">mcg/kg/min</span>
+      <span id="doseAlert" class="unit" aria-live="polite"></span>
+    </div>
+    
+    <div class="field">
+      <label>Patient Dosing Weight:</label>
+      <input type="number" id="weight" step="0.1" oninput="calculate()">
+      <span class="unit">kg</span>
+    </div>
+  </div>
+
+  <div id="reverseDoseWeightSection" class="hidden">
+    <div class="field">
+      <label>Hospital Dose:</label>
+      <input type="number" id="reverseDose" step="0.1" oninput="calculate()">
+      <span class="unit">mcg/kg/min</span>
+    </div>
+    <div class="field">
+      <label>Hospital Rate:</label>
+      <input type="number" id="reverseRate" step="0.1" oninput="calculate()">
+      <span class="unit">mL/hr</span>
+    </div>
+    <div class="field">
+      <label>Hospital Concentration:</label>
+      <select id="reverseConc" onchange="calculate()">
+        <option data-drug="dobutamine" value="4">4 mg/mL</option>
+        <option data-drug="dobutamine" value="5">5 mg/mL</option>
+        <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
+        <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
+        <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
+      </select>
+      <span class="unit">mg/mL</span>
+    </div>
+    <div class="field">
+      <label>Calculated Dose Weight:</label>
+      <input type="text" id="resCalculatedWeight_kg" readonly class="result">
+      <span class="unit">kg</span>
+      <input type="text" id="resCalculatedWeight_lb" readonly class="result">
+      <span class="unit">lb</span>
+    </div>
   </div>
 
   <div class="field">
@@ -244,6 +287,25 @@ function clearPatientFields() {
   if (dateEl) dateEl.value = today;
 }
 
+function doseWeightModeChanged() {
+  const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
+  const directSection = document.getElementById('directDoseWeightSection');
+  const reverseSection = document.getElementById('reverseDoseWeightSection');
+  if (!directSection || !reverseSection) return;
+  const yes = mode && mode.value === 'yes';
+  directSection.classList.toggle('hidden', !yes);
+  reverseSection.classList.toggle('hidden', yes);
+  if (!yes) {
+    const drug = document.getElementById('drug');
+    const reverseConcEl = document.getElementById('reverseConc');
+    if (reverseConcEl && drug) {
+      const target = Array.from(reverseConcEl.options).find(option => option.dataset.drug === drug.value);
+      if (target) target.selected = true;
+    }
+  }
+  calculate();
+}
+
 function printReport() {
   window.print();
 }
@@ -263,7 +325,7 @@ function setupPrivacy() {
 }
 
 function resetAll() {
-  ['dose', 'weight', 'overfill', 'concentration', 'patient'].forEach(id => {
+  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.value = id === 'overfill' ? '15' : '';
@@ -274,6 +336,9 @@ function resetAll() {
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
+  const modeRadio = document.querySelector('input[name="doseWeightProvided"][value="yes"]');
+  if (modeRadio) modeRadio.checked = true;
+  doseWeightModeChanged();
   setToday();
   calculate();
 }
@@ -310,12 +375,50 @@ function calculate() {
     const overfillEl = document.getElementById('overfill');
     const concEl = document.getElementById('concentration');
 
+    const doseWeightRadio = document.querySelector('input[name="doseWeightProvided"]:checked');
+    const doseWeightProvided = doseWeightRadio ? doseWeightRadio.value === 'yes' : true;
+
+    const reverseDoseEl = document.getElementById('reverseDose');
+    const reverseRateEl = document.getElementById('reverseRate');
+    const reverseConcEl = document.getElementById('reverseConc');
+
+    let dose_mcg_kg_min = 0;
+    let weight_kg = 0;
+    let bagHours = 0;
+    let overfill_percent = 0;
+    let conc_mg_ml = 0;
+
+    if (!doseWeightProvided) {
+      const reverseDose = reverseDoseEl ? parseFloat(reverseDoseEl.value) || 0 : 0;
+      const reverseRate = reverseRateEl ? parseFloat(reverseRateEl.value) || 0 : 0;
+      const reverseConc = reverseConcEl ? parseFloat(reverseConcEl.value) || 0 : 0;
+      dose_mcg_kg_min = reverseDose;
+      const concForCalc = concEl ? parseFloat(concEl.value) || reverseConc : reverseConc;
+      bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
+      overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
+      conc_mg_ml = reverseConc;
+      if (reverseDose) {
+        weight_kg = reverseRate * (reverseConc || concForCalc) / 0.06 / reverseDose;
+      }
+      const weightKgEl = document.getElementById('resCalculatedWeight_kg');
+      const weightLbEl = document.getElementById('resCalculatedWeight_lb');
+      if (weightKgEl) weightKgEl.value = weight_kg ? Number(weight_kg.toFixed(2)) : '';
+      if (weightLbEl) weightLbEl.value = weight_kg ? Number((weight_kg * 2.20462).toFixed(2)) : '';
+      if (doseEl) doseEl.value = reverseDoseEl ? reverseDoseEl.value : '';
+      if (weightEl) weightEl.value = weight_kg ? Number(weight_kg.toFixed(2)) : '';
+    } else {
+      dose_mcg_kg_min = doseEl ? parseFloat(doseEl.value) || 0 : 0;
+      weight_kg = weightEl ? parseFloat(weightEl.value) || 0 : 0;
+      bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
+      overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
+      conc_mg_ml = concEl ? parseFloat(concEl.value) || 0 : 0;
+      const weightKgEl = document.getElementById('resCalculatedWeight_kg');
+      const weightLbEl = document.getElementById('resCalculatedWeight_lb');
+      if (weightKgEl) weightKgEl.value = '';
+      if (weightLbEl) weightLbEl.value = '';
+    }
+
     const drug = drugEl ? drugEl.value : '';
-    const dose_mcg_kg_min = doseEl ? parseFloat(doseEl.value) || 0 : 0;
-    const weight_kg = weightEl ? parseFloat(weightEl.value) || 0 : 0;
-    const bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
-    const overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
-    const conc_mg_ml = concEl ? parseFloat(concEl.value) || 0 : 0;
 
     const doseAlertEl = document.getElementById('doseAlert');
     const doseRanges = {
