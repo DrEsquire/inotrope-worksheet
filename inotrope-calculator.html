@@ -206,14 +206,6 @@
         <label>Minimum Pump Order (mL):</label>
         <input type="text" id="resMinOrder_mL" readonly class="result">
       </div>
-      <div class="field">
-        <label>Final Compounded Dose (mg):</label>
-        <input type="text" id="resFinal_mg" readonly class="result">
-      </div>
-      <div class="field">
-        <label>Final Compounded Dose (mL):</label>
-        <input type="text" id="resFinal_mL" readonly class="result">
-      </div>
     </div>
   </div>
 </div>
@@ -231,6 +223,14 @@
   <div class="field">
     <label>RATE:</label>
     <input type="text" id="pumpRate" readonly class="result"> <span class="unit">mL/hr</span>
+  </div>
+  <div class="field">
+    <label>Final Compounded Dose (mg):</label>
+    <input type="text" id="resFinal_mg_pump" readonly class="result"> <span class="unit">mg</span>
+  </div>
+  <div class="field">
+    <label>Final Compounded Dose (mL):</label>
+    <input type="text" id="resFinal_mL_pump" readonly class="result"> <span class="unit">mL</span>
   </div>
   <div class="field">
     <label>Time:</label>
@@ -325,7 +325,7 @@ function setupPrivacy() {
 }
 
 function resetAll() {
-  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient'].forEach(id => {
+  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.value = id === 'overfill' ? '15' : '';
@@ -505,8 +505,8 @@ function calculate() {
     if (document.getElementById('resBagOverfill_mL')) document.getElementById('resBagOverfill_mL').value = fmt(bag_mL_with_overfill);
     if (document.getElementById('resMinOrder_mg')) document.getElementById('resMinOrder_mg').value = fmt(minOrder_mg);
     if (document.getElementById('resMinOrder_mL')) document.getElementById('resMinOrder_mL').value = fmt(minOrder_mL);
-    if (document.getElementById('resFinal_mg')) document.getElementById('resFinal_mg').value = fmt(final_mg);
-    if (document.getElementById('resFinal_mL')) document.getElementById('resFinal_mL').value = fmt(final_mL);
+    if (document.getElementById('resFinal_mg_pump')) document.getElementById('resFinal_mg_pump').value = fmt(final_mg);
+    if (document.getElementById('resFinal_mL_pump')) document.getElementById('resFinal_mL_pump').value = fmt(final_mL);
     if (document.getElementById('resMaxTime')) document.getElementById('resMaxTime').value = maxTime;
     if (document.getElementById('resRate')) document.getElementById('resRate').value = pumpRate;
     if (document.getElementById('pumpVol')) document.getElementById('pumpVol').value = fmt(pumpVol);
