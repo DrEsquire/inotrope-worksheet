@@ -34,11 +34,11 @@
   .hidden { display: none; }
   .radio-group label { margin-right: 12px; font-weight: normal; cursor: pointer; }
 </style>
+<title>Inotrope Dose Calculator</title>
 </head>
 <body>
-
 <div class="card">
-  <h1>Inotrope Worksheet Calculator</h1>
+  <h1>Inotrope Dose Calculator</h1>
   <p class="privacy-notice">This worksheet runs entirely in your browser. Patient-identifying fields are used for printing only and are <strong>never saved to disk, uploaded, or stored</strong>. Clearing the page or closing the tab removes them.</p>
 
   <div class="date-display" id="currentDate"></div>
@@ -46,6 +46,14 @@
   <div class="field patient-field">
     <label>Patient:</label>
     <input type="text" id="patient" autocomplete="off" oninput="calculate()">
+  </div>
+  <div class="field patient-field">
+    <label>Date of Birth:</label>
+    <input type="text" id="dob" autocomplete="off" oninput="calculate()">
+  </div>
+  <div class="field patient-field">
+    <label>MRN:</label>
+    <input type="text" id="mrn" autocomplete="off" oninput="calculate()">
   </div>
   <div class="field patient-field">
     <label>Date:</label>
@@ -288,10 +296,15 @@ function clearPatientFields() {
   const day = String(rawToday.getDate()).padStart(2, '0');
   const year = rawToday.getFullYear();
   const today = month + '/' + day + '/' + year;
-  const patient = document.getElementById('patient');
-  const dateEl = document.getElementById('date');
-  if (patient) patient.value = '';
-  if (dateEl) dateEl.value = today;
+  ['patient', 'dob', 'mrn', 'date'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'date') {
+      el.value = today;
+    } else {
+      el.value = '';
+    }
+  });
 }
 
 function doseWeightModeChanged() {
@@ -318,13 +331,13 @@ function printReport() {
 }
 
 function setupPrivacy() {
-  ['patient', 'date'].forEach(id => {
+  ['patient', 'dob', 'mrn', 'date'].forEach(function(id) {
     const el = document.getElementById(id);
     if (!el) return;
     el.setAttribute('autocomplete', 'off');
     el.setAttribute('readonly', 'readonly');
-    el.addEventListener('focus', function () { this.removeAttribute('readonly'); });
-    el.addEventListener('blur', function () { this.setAttribute('readonly', 'readonly'); });
+    el.addEventListener('focus', function() { this.removeAttribute('readonly'); });
+    el.addEventListener('blur', function() { this.setAttribute('readonly', 'readonly'); });
   });
   const clearOnHide = clearPatientFields;
   window.addEventListener('pagehide', clearOnHide);
@@ -332,7 +345,7 @@ function setupPrivacy() {
 }
 
 function resetAll() {
-  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
+  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient', 'dob', 'mrn', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.value = id === 'overfill' ? '15' : '';
