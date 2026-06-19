@@ -544,8 +544,9 @@ function calculate() {
     const bag_mg_with_overfill = dose_mg_bag * overfill_factor;
     const bag_mL_with_overfill = conc_mg_ml_final ? bag_mg_with_overfill / conc_mg_ml_final : '';
 
-    const rate_ml_hr = conc_mg_ml_final ? round(dose_mg_hr / conc_mg_ml_final, 1) : '';
-    const minOrder_mL = conc_mg_ml_final && rate_ml_hr !== '' ? rate_ml_hr * bagHours : '';
+    const rate_ml_hr_exact = conc_mg_ml_final ? dose_mg_hr / conc_mg_ml_final : '';
+    const rate_ml_hr = rate_ml_hr_exact !== '' ? roundToTenth(rate_ml_hr_exact) : '';
+    const minOrder_mL = conc_mg_ml_final && rate_ml_hr_exact !== '' ? rate_ml_hr_exact * bagHours : '';
     const minOrder_mg = minOrder_mL !== '' ? minOrder_mL * conc_mg_ml_final : '';
 
     function practicalRoundUp(value, increment) {
@@ -564,7 +565,7 @@ function calculate() {
     const final_mL = minOrder_mL !== '' ? practicalRoundUp(minOrder_mL, getIncrement(minOrder_mL)) : '';
     const final_mg = final_mL !== '' ? practicalRoundUp(final_mL * conc_mg_ml_final, getIncrement(final_mL * conc_mg_ml_final)) : '';
 
-    const maxMinutes = (final_mL && rate_ml_hr) ? Math.round((final_mL / rate_ml_hr) * 60) : '';
+    const maxMinutes = (final_mL && rate_ml_hr_exact) ? Math.round((final_mL / rate_ml_hr_exact) * 60) : '';
     const maxHours = maxMinutes !== '' ? Math.floor(maxMinutes / 60) : '';
     const maxMins = maxMinutes !== '' ? maxMinutes % 60 : '';
     const maxTime = maxMinutes !== '' ? String(maxHours).padStart(2, '0') + ':' + String(maxMins).padStart(2, '0') : '';
