@@ -34,6 +34,8 @@
   .hidden { display: none; }
   .radio-group label { margin-right: 12px; font-weight: normal; cursor: pointer; }
   .signature-box { border-bottom: 1px solid #333; height: 32px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: #333; }
+  .highlight { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; border-radius: 0 4px 4px 0; }
+  .highlight-blue { background: #e3f2fd; border: 2px solid #90caf9; border-radius: 6px; padding: 14px; }
 </style>
 <title>Inotrope Dose Calculator</title>
 </head>
@@ -546,7 +548,7 @@ function calculate() {
 
     const rate_ml_hr_exact = conc_mg_ml_final ? dose_mg_hr / conc_mg_ml_final : '';
     const rate_ml_hr = rate_ml_hr_exact !== '' ? roundToTenth(rate_ml_hr_exact) : '';
-    const minOrder_mL = conc_mg_ml_final && rate_ml_hr_exact !== '' ? rate_ml_hr_exact * bagHours : '';
+    const minOrder_mL = conc_mg_ml_final && rate_ml_hr_exact !== '' ? rate_ml_hr_exact * (bagHours + 4) : '';
     const minOrder_mg = minOrder_mL !== '' ? minOrder_mL * conc_mg_ml_final : '';
 
     function practicalRoundUp(value, increment) {
