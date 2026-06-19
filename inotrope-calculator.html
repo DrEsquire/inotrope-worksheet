@@ -339,8 +339,8 @@ function doseWeightModeChanged() {
 
   const reverseDoseLabel = document.getElementById('reverseDoseLabel');
   const reverseWeightLabel = document.getElementById('reverseWeightLabel');
-  if (reverseDoseLabel) reverseDoseLabel.textContent = yes ? 'Hospital Dose:' : 'Dose:';
-  if (reverseWeightLabel) reverseWeightLabel.textContent = yes ? 'Hospital Rate:' : 'Hospital Weight:';
+  if (reverseDoseLabel) reverseDoseLabel.textContent = 'Hospital Dose:';
+  if (reverseWeightLabel) reverseWeightLabel.textContent = 'Hospital Rate:';
 
   directSection.classList.toggle('hidden', !yes);
   reverseSection.classList.toggle('hidden', yes);
@@ -511,22 +511,23 @@ function calculate() {
       milrinone: { min: 0.125, max: 0.5 }
     };
     if (doseAlertEl) {
-      const value = doseEl && doseEl.value !== '' ? parseFloat(doseEl.value) : NaN;
+      const sourceEl = doseWeightProvided ? doseEl : reverseDoseEl;
+      const value = sourceEl && sourceEl.value !== '' ? parseFloat(sourceEl.value) : NaN;
       const range = value === value && doseRanges[drug] ? doseRanges[drug] : null;
       if (range && !Number.isNaN(value)) {
         if (value < range.min || value > range.max) {
           doseAlertEl.textContent = 'Outside usual adult range: ' + range.min + '-' + range.max + ' mcg/kg/min';
           doseAlertEl.className = 'unit dose-alert';
-          if (doseEl) doseEl.className = 'dose-no';
+          if (sourceEl) sourceEl.className = 'dose-no';
         } else {
           doseAlertEl.textContent = 'Within usual adult range';
           doseAlertEl.className = 'unit';
-          if (doseEl) doseEl.className = 'dose-yes';
+          if (sourceEl) sourceEl.className = 'dose-yes';
         }
-      } else if (doseEl && doseEl.value === '') {
+      } else if (sourceEl && sourceEl.value === '') {
         doseAlertEl.textContent = '';
         doseAlertEl.className = 'unit';
-        if (doseEl) doseEl.className = '';
+        if (sourceEl) sourceEl.className = '';
       }
     }
 
