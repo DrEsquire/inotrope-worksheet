@@ -246,8 +246,8 @@
         <input type="text" id="pumpRate" readonly class="result"> <span class="unit">mL/hr</span>
       </div>
       <div class="field">
-        <label>Time:</label>
-        <input type="text" id="pumpTime" readonly class="result"> <span class="unit">hr</span>
+        <label>Max Time:</label>
+        <input type="text" id="pumpTime" readonly class="result"> <span class="unit">HH:MM</span>
       </div>
       <div class="field">
         <label>KVO:</label>
@@ -395,9 +395,22 @@ function round(x, decimals) {
   return x ? Number(x.toFixed(decimals)) : '';
 }
 
+function roundToTenth(value) {
+  if (value === '' || value === null || value === undefined) return '';
+  return Number(Number(value).toFixed(1));
+}
+
 function fmt(n) {
   if (n === '' || n === null || n === undefined) return '';
   return Number(n).toFixed(2);
+}
+
+function formatHoursAsHHMM(hours) {
+  if (hours === '' || hours === null || hours === undefined) return '';
+  const totalMinutes = Math.round(Number(hours) * 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
 }
 
 function drugChanged() {
@@ -551,7 +564,10 @@ function calculate() {
     const final_mL = minOrder_mL !== '' ? practicalRoundUp(minOrder_mL, getIncrement(minOrder_mL)) : '';
     const final_mg = final_mL !== '' ? practicalRoundUp(final_mL * conc_mg_ml_final, getIncrement(final_mL * conc_mg_ml_final)) : '';
 
-    const maxTime = (final_mL && rate_ml_hr) ? round(final_mL / rate_ml_hr) : '';
+    const maxMinutes = (final_mL && rate_ml_hr) ? Math.round((final_mL / rate_ml_hr) * 60) : '';
+    const maxHours = maxMinutes !== '' ? Math.floor(maxMinutes / 60) : '';
+    const maxMins = maxMinutes !== '' ? maxMinutes % 60 : '';
+    const maxTime = maxMinutes !== '' ? String(maxHours).padStart(2, '0') + ':' + String(maxMins).padStart(2, '0') : '';
     const pumpVol = final_mL || minOrder_mL;
     const pumpAtbi = minOrder_mL;
     const pumpRate = rate_ml_hr;
@@ -569,13 +585,13 @@ function calculate() {
     if (document.getElementById('resMinOrder_mL')) document.getElementById('resMinOrder_mL').value = fmt(minOrder_mL);
     if (document.getElementById('resFinal_mg_pump')) document.getElementById('resFinal_mg_pump').value = fmt(final_mg);
     if (document.getElementById('resFinal_mL_pump')) document.getElementById('resFinal_mL_pump').value = fmt(final_mL);
-    if (document.getElementById('resMaxTime')) document.getElementById('resMaxTime').value = maxTime;
-    if (document.getElementById('resRate')) document.getElementById('resRate').value = pumpRate;
-    if (document.getElementById('pumpVol')) document.getElementById('pumpVol').value = fmt(pumpVol);
-    if (document.getElementById('pumpAtbi')) document.getElementById('pumpAtbi').value = fmt(pumpAtbi);
-    if (document.getElementById('pumpRate')) document.getElementById('pumpRate').value = fmt(pumpRate);
-    if (document.getElementById('pumpTime')) document.getElementById('pumpTime').value = fmt(pumpTime);
-    if (document.getElementById('pumpKvo')) document.getElementById('pumpKvo').value = fmt(pumpKvo);
+    if (document.getElementById('resMaxTime')) document.getElementById('resMaxTime').value = formatHoursAsHHMM(maxTime);
+    if (document.getElementById('resRate')) document.getElementById('resRate').value = roundToTenth(pumpRate);
+    if (document.getElementById('pumpVol')) document.getElementById('pumpVol').value = roundToTenth(pumpVol);
+    if (document.getElementById('pumpAtbi')) document.getElementById('pumpAtbi').value = roundToTenth(pumpAtbi);
+    if (document.getElementById('pumpRate')) document.getElementById('pumpRate').value = roundToTenth(pumpRate);
+    if (document.getElementById('pumpTime')) document.getElementById('pumpTime').value = formatHoursAsHHMM(pumpTime);
+    if (document.getElementById('pumpKvo')) document.getElementById('pumpKvo').value = roundToTenth(pumpKvo);
   } catch (error) {
     console.error(error);
   }
