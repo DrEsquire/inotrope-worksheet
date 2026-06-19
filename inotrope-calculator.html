@@ -33,6 +33,7 @@
   .dose-alert { color: #c0392b; font-weight: bold; }
   .hidden { display: none; }
   .radio-group label { margin-right: 12px; font-weight: normal; cursor: pointer; }
+  .signature-box { border-bottom: 1px solid #333; height: 32px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: #333; }
 </style>
 <title>Inotrope Dose Calculator</title>
 </head>
@@ -263,13 +264,15 @@
     <div class="col">
       <div class="field">
         <label>Pharmacist 1:</label>
-        <input type="text" id="pharmacist" oninput="calculate()">
+        <div class="signature-box">Sign:</div>
+        <input type="text" id="pharmacist" placeholder="Print name" oninput="calculate()">
       </div>
     </div>
     <div class="col">
       <div class="field">
         <label>Pharmacist 2 (Verification):</label>
-        <input type="text" id="pharmacist2" oninput="calculate()">
+        <div class="signature-box">Sign:</div>
+        <input type="text" id="pharmacist2" placeholder="Print name" oninput="calculate()">
       </div>
     </div>
   </div>
