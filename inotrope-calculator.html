@@ -565,7 +565,11 @@ function calculate() {
     const final_mL = minOrder_mL !== '' ? practicalRoundUp(minOrder_mL, getIncrement(minOrder_mL)) : '';
     const final_mg = final_mL !== '' ? practicalRoundUp(final_mL * conc_mg_ml_final, getIncrement(final_mL * conc_mg_ml_final)) : '';
 
-    const maxTime = (final_mL && rate_ml_hr_exact) ? (final_mL / rate_ml_hr_exact) : '';
+    const maxMinutes = (final_mL && rate_ml_hr_exact) ? Math.round((final_mL / rate_ml_hr_exact) * 60) : '';
+    const maxHours = maxMinutes !== '' ? Math.floor(maxMinutes / 60) : '';
+    const maxMins = maxMinutes !== '' ? maxMinutes % 60 : '';
+    const maxTime = maxMinutes !== '' ? String(maxHours).padStart(2, '0') + ':' + String(maxMins).padStart(2, '0') : '';
+
     const pumpVol = final_mL || minOrder_mL;
     const pumpAtbi = minOrder_mL;
     const pumpRate = rate_ml_hr;
