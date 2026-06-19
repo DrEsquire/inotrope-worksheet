@@ -69,14 +69,9 @@
     </select>
   </div>
 
-  <div class="highlight">
-    <strong>Stock Vials &amp; Dilution:</strong><br>
-    Dobutamine stock: 12.5 mg/mL vial<br>
-    Milrinone stock: 1 mg/mL vial<br>
-    <br>
-    Usual bag concentrations:<br>
-    Dobutamine: 4 mg/mL or 5 mg/mL<br>
-    Milrinone: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL
+  <div class="highlight" id="drugInfo">
+    <strong>Drug:</strong>
+    <span id="drugInfoText"></span>
   </div>
 </div>
 
@@ -383,6 +378,7 @@ function drugChanged() {
     const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
     if (target) target.selected = true;
   }
+  updateDrugInfo();
   const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
   if (mode && mode.value === 'no') {
     const reverseConcEl = document.getElementById('reverseConc');
@@ -392,6 +388,20 @@ function drugChanged() {
     }
   }
   calculate();
+}
+
+function updateDrugInfo() {
+  const drugEl = document.getElementById('drug');
+  const textEl = document.getElementById('drugInfoText');
+  if (!drugEl || !textEl) return;
+  const drug = drugEl.value;
+  let text = '';
+  if (drug === 'dobutamine') {
+    text = 'Dobutamine stock: 12.5 mg/mL vial. Usual bag concentrations: 4 mg/mL or 5 mg/mL.';
+  } else if (drug === 'milrinone') {
+    text = 'Milrinone stock: 1 mg/mL vial. Usual bag concentrations: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL.';
+  }
+  textEl.textContent = text;
 }
 
 function calculate() {
