@@ -36,6 +36,23 @@
   .signature-box { border-bottom: 1px solid #333; height: 32px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: #333; }
   .highlight { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; border-radius: 0 4px 4px 0; }
   .highlight-blue { background: #e3f2fd; border: 2px solid #90caf9; border-radius: 6px; padding: 14px; }
+
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.55in 0.45in;
+    }
+    body {
+      max-width: 100%;
+      margin: 0;
+      background: white;
+    }
+    .card { break-inside: avoid; }
+    .row { flex-wrap: nowrap; }
+    .col { min-width: 0; }
+    button { display: none; }
+    input, select { border: 1px solid #aaa; }
+  }
 </style>
 <title>Inotrope Dose Calculator</title>
 </head>
