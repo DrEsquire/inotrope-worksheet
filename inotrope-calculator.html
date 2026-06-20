@@ -166,12 +166,6 @@
   </div>
 
   <div class="field">
-    <label>Overfill:</label>
-    <input type="number" id="overfill" step="1" oninput="calculate()" value="15">
-    <span class="unit">%</span>
-  </div>
-
-  <div class="field">
     <label>Standard Concentration:</label>
     <select id="concentration" onchange="calculate()">
       <option data-drug="dobutamine" value="4">4 mg/mL</option>
@@ -394,10 +388,10 @@ function setupPrivacy() {
 }
 
 function resetAll() {
-  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'overfill', 'concentration', 'patient', 'dob', 'mrn', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
+  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'concentration', 'patient', 'dob', 'mrn', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.value = id === 'overfill' ? '15' : '';
+    el.value = id === 'bagHours' ? '48' : '';
   });
   const drug = document.getElementById('drug');
   const concEl = document.getElementById('concentration');
@@ -477,7 +471,6 @@ function calculate() {
     const doseEl = document.getElementById('dose');
     const weightEl = document.getElementById('weight');
     const bagHoursEl = document.getElementById('bagHours');
-    const overfillEl = document.getElementById('overfill');
     const concEl = document.getElementById('concentration');
 
     const doseWeightRadio = document.querySelector('input[name="doseWeightProvided"]:checked');
@@ -490,7 +483,6 @@ function calculate() {
     let dose_mcg_kg_min = 0;
     let weight_kg = 0;
     let bagHours = 0;
-    let overfill_percent = 0;
     let conc_mg_ml = 0;
 
     if (!doseWeightProvided) {
@@ -500,7 +492,6 @@ function calculate() {
       dose_mcg_kg_min = reverseDose;
       const concForCalc = concEl ? parseFloat(concEl.value) || reverseConc : reverseConc;
       bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
-      overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
       conc_mg_ml = reverseConc;
       if (reverseDose) {
         weight_kg = reverseRate * (reverseConc || concForCalc) / 0.06 / reverseDose;
@@ -515,7 +506,6 @@ function calculate() {
       dose_mcg_kg_min = doseEl ? parseFloat(doseEl.value) || 0 : 0;
       weight_kg = weightEl ? parseFloat(weightEl.value) || 0 : 0;
       bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
-      overfill_percent = overfillEl ? parseFloat(overfillEl.value) || 0 : 0;
       conc_mg_ml = concEl ? parseFloat(concEl.value) || 0 : 0;
       const weightKgEl = document.getElementById('resCalculatedWeight_kg');
       const weightLbEl = document.getElementById('resCalculatedWeight_lb');
@@ -563,7 +553,7 @@ function calculate() {
     const dailyOrder = dose_mg_hr * 24;
     const bag_calc_mL = conc_mg_ml_final ? dailyOrder / conc_mg_ml_final : (dailyOrder ? '' : '');
 
-    const overfill_factor = 1 + overfill_percent / 100;
+    const overfill_factor = 1.15;
     const bag_mg_with_overfill = dose_mg_bag * overfill_factor;
     const bag_mL_with_overfill = conc_mg_ml_final ? bag_mg_with_overfill / conc_mg_ml_final : '';
 
