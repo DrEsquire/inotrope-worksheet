@@ -507,10 +507,10 @@ function calculate() {
       }
       const weightKgEl = document.getElementById('resCalculatedWeight_kg');
       const weightLbEl = document.getElementById('resCalculatedWeight_lb');
-      if (weightKgEl) weightKgEl.value = weight_kg ? Number(weight_kg.toFixed(2)) : '';
-      if (weightLbEl) weightLbEl.value = weight_kg ? Number((weight_kg * 2.20462).toFixed(2)) : '';
+      if (weightKgEl) weightKgEl.value = roundToTenth(weight_kg);
+      if (weightLbEl) weightLbEl.value = roundToTenth(weight_kg * 2.20462);
       if (doseEl) doseEl.value = reverseDoseEl ? reverseDoseEl.value : '';
-      if (weightEl) weightEl.value = weight_kg ? Number(weight_kg.toFixed(2)) : '';
+      if (weightEl) weightEl.value = roundToTenth(weight_kg);
     } else {
       dose_mcg_kg_min = doseEl ? parseFloat(doseEl.value) || 0 : 0;
       weight_kg = weightEl ? parseFloat(weightEl.value) || 0 : 0;
@@ -599,15 +599,15 @@ function calculate() {
     const pumpTime = bagHours;
     const pumpKvo = rate_ml_hr;
 
-    if (document.getElementById('resBag_mL')) document.getElementById('resBag_mL').value = fmt(bag_calc_mL);
-    if (document.getElementById('resDose_mcg_min')) document.getElementById('resDose_mcg_min').value = fmt(dose_mcg_min);
-    if (document.getElementById('resDose_mg_hr')) document.getElementById('resDose_mg_hr').value = fmt(dose_mg_hr);
-    if (document.getElementById('resDailyOrder')) document.getElementById('resDailyOrder').value = fmt(dailyOrder);
-    if (document.getElementById('resDose_mg_bag')) document.getElementById('resDose_mg_bag').value = fmt(dose_mg_bag);
-    if (document.getElementById('resBagOverfill_mg')) document.getElementById('resBagOverfill_mg').value = fmt(bag_mg_with_overfill);
-    if (document.getElementById('resBagOverfill_mL')) document.getElementById('resBagOverfill_mL').value = fmt(bag_mL_with_overfill);
-    if (document.getElementById('resMinOrder_mg')) document.getElementById('resMinOrder_mg').value = fmt(minOrder_mg);
-    if (document.getElementById('resMinOrder_mL')) document.getElementById('resMinOrder_mL').value = fmt(minOrder_mL);
+    if (document.getElementById('resBag_mL')) document.getElementById('resBag_mL').value = roundToTenth(bag_calc_mL);
+    if (document.getElementById('resDose_mcg_min')) document.getElementById('resDose_mcg_min').value = roundToTenth(dose_mcg_min);
+    if (document.getElementById('resDose_mg_hr')) document.getElementById('resDose_mg_hr').value = roundToTenth(dose_mg_hr);
+    if (document.getElementById('resDailyOrder')) document.getElementById('resDailyOrder').value = roundToTenth(dailyOrder);
+    if (document.getElementById('resDose_mg_bag')) document.getElementById('resDose_mg_bag').value = roundToTenth(dose_mg_bag);
+    if (document.getElementById('resBagOverfill_mg')) document.getElementById('resBagOverfill_mg').value = roundToTenth(bag_mg_with_overfill);
+    if (document.getElementById('resBagOverfill_mL')) document.getElementById('resBagOverfill_mL').value = roundToTenth(bag_mL_with_overfill);
+    if (document.getElementById('resMinOrder_mg')) document.getElementById('resMinOrder_mg').value = roundToTenth(minOrder_mg);
+    if (document.getElementById('resMinOrder_mL')) document.getElementById('resMinOrder_mL').value = roundToTenth(minOrder_mL);
     if (document.getElementById('resFinal_mg_pump')) document.getElementById('resFinal_mg_pump').value = roundToTenth(final_mg);
     if (document.getElementById('resFinal_mL_pump')) document.getElementById('resFinal_mL_pump').value = roundToTenth(final_mL);
     if (document.getElementById('resMaxTime')) document.getElementById('resMaxTime').value = maxTime;
