@@ -36,6 +36,7 @@
   .signature-box { border-bottom: 1px solid #333; height: 32px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: #333; }
   .highlight { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; border-radius: 0 4px 4px 0; }
   .highlight-blue { background: #e3f2fd; border: 2px solid #90caf9; border-radius: 6px; padding: 14px; }
+  .highlight-green { background: #e8f5e9; border: 2px solid #a5d6a7; border-radius: 6px; padding: 14px; }
 
   @media print {
     @page {
@@ -49,6 +50,7 @@
     }
     .card { break-inside: avoid; }
     .highlight-blue { break-inside: avoid; }
+    .highlight-green { break-inside: avoid; }
     .row { flex-wrap: nowrap; }
     .col { min-width: 0; }
     button { display: none; }
@@ -235,7 +237,7 @@
 </div>
 
 <div class="card">
-  <div class="row">
+  <div class="row highlight-green">
     <div class="col">
       <h2>Final Compounded Dose</h2>
       <div class="field">
@@ -246,7 +248,7 @@
         <label><strong>Final Compounded Dose (mL):</strong></label>
         <input type="text" id="resFinal_mL_pump" readonly class="result"> <span class="unit">mL</span>
       </div>
-      <div class="field">
+      <div class="field" style="margin-top: 24px;">
         <label>Max Time (hr):</label>
         <input type="text" id="resMaxTime" readonly class="result">
       </div>
