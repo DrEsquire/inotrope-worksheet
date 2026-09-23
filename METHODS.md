@@ -27,7 +27,7 @@ specification of the tool's behavior.
 |------|-------------------------------|------------|
 | Dobutamine | 4 mg/mL, 5 mg/mL | 12.5 mg/mL |
 | Milrinone | 0.2 mg/mL, 0.4 mg/mL, 0.8 mg/mL | 1 mg/mL |
-| Dopamine* | 40 mg/mL, 80 mg/mL | 40 mg/mL or 80 mg/mL |
+| Dopamine* | 0.2 mg/mL, 0.8 mg/mL, 1.6 mg/mL | 40 mg/mL or 80 mg/mL |
 
 \* **Dopamine is reserved for the acute care setting.** Selecting dopamine
 displays a prominent warning banner in the tool.

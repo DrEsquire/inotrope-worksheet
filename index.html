@@ -227,8 +227,9 @@
         <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
         <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
         <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
-        <option data-drug="dopamine" value="40">40 mg/mL</option>
-        <option data-drug="dopamine" value="80">80 mg/mL</option>
+        <option data-drug="dopamine" value="0.8">0.8 mg/mL</option>
+        <option data-drug="dopamine" value="1.6">1.6 mg/mL</option>
+        <option data-drug="dopamine" value="0.2">0.2 mg/mL</option>
       </select>
       <span class="unit">mg/mL</span>
     </div>
@@ -255,8 +256,9 @@
       <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
       <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
       <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
-      <option data-drug="dopamine" value="40">40 mg/mL</option>
-      <option data-drug="dopamine" value="80">80 mg/mL</option>
+      <option data-drug="dopamine" value="0.8">0.8 mg/mL</option>
+      <option data-drug="dopamine" value="1.6">1.6 mg/mL</option>
+      <option data-drug="dopamine" value="0.2">0.2 mg/mL</option>
     </select>
     <span class="unit">mg/mL</span>
   </div>
@@ -397,7 +399,7 @@
 const drugDefaults = {
   dobutamine: { options: [4, 5] },
   milrinone: { options: [0.2, 0.4, 0.8] },
-  dopamine: { options: [40, 80] }
+  dopamine: { options: [0.8, 1.6, 0.2] }
 };
 
 const bagHoursDefaults = { dobutamine: 24, milrinone: 12, dopamine: 24 };
@@ -557,7 +559,7 @@ function updateDrugInfo() {
     html = 'Milrinone stock: 1 mg/mL vial. Usual bag concentrations: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL.';
   } else if (drug === 'dopamine') {
     html = '<span class="acute-warning">\u26A0 DOPAMINE IS RESERVED FOR THE ACUTE CARE SETTING</span>'
-         + 'Dopamine stock: 40 mg/mL or 80 mg/mL vial. Usual bag concentrations: 40 mg/mL or 80 mg/mL. Usual dose range: 2\u201320 mcg/kg/min.';
+         + 'Dopamine stock: 40 mg/mL or 80 mg/mL vial. Usual bag (standard) concentrations: 0.2 mg/mL, 0.8 mg/mL, or 1.6 mg/mL. Usual dose range: 2\u201320 mcg/kg/min.';
     acute = true;
   }
   textEl.innerHTML = html;
