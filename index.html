@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, noarchive">
 <meta name="description" content="Free browser-based inotrope (dobutamine, milrinone, dopamine) IV compounding worksheet for pharmacists. Runs entirely offline; no patient data is stored or uploaded.">
 <title>Inotrope Compounding Worksheet</title>
 <style>
@@ -141,25 +144,25 @@
 </header>
 
 <div class="card">
-  <p class="privacy-notice">This worksheet runs entirely in your browser. Patient-identifying fields are used for printing only and are <strong>never saved to disk, uploaded, or stored</strong>. Clearing the page or closing the tab removes them.</p>
+  <p class="privacy-notice">This worksheet runs entirely in your browser. Patient-identifying fields (Patient, DOB, MRN, Date) are used for on-screen display and printing only. They are <strong>never saved to disk, cached, uploaded, or transmitted</strong> &mdash; a browser-enforced Content-Security-Policy blocks all outbound network connections, and the fields auto-clear when you reset the form or close the tab. No cookies, no local storage, no analytics.</p>
 
   <div class="date-display" id="currentDate"></div>
 
   <div class="field patient-field">
     <label>Patient:</label>
-    <input type="text" id="patient" autocomplete="off" oninput="calculate()">
+    <input type="text" id="patient" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" oninput="calculate()">
   </div>
   <div class="field patient-field">
     <label>Date of Birth:</label>
-    <input type="text" id="dob" autocomplete="off" oninput="calculate()">
+    <input type="text" id="dob" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" oninput="calculate()">
   </div>
   <div class="field patient-field">
     <label>MRN:</label>
-    <input type="text" id="mrn" autocomplete="off" oninput="calculate()">
+    <input type="text" id="mrn" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" oninput="calculate()">
   </div>
   <div class="field patient-field">
     <label>Date:</label>
-    <input type="text" id="date" autocomplete="off" oninput="calculate()">
+    <input type="text" id="date" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" oninput="calculate()">
   </div>
 
   <div class="highlight">

@@ -181,7 +181,50 @@ The derived weight then feeds the standard forward formulas in sections 2–8.
 
 ---
 
-## 11. Worked example
+## 11. Privacy &amp; data handling (HIPAA posture)
+
+This tool is designed so that patient-identifying information entered into it
+**never leaves the browser tab it is typed into**. The following are enforced by
+the application:
+
+- **No storage.** The code contains no `localStorage`, `sessionStorage`,
+  `indexedDB`, or cookies. Nothing is written to disk.
+- **No transmission — browser-enforced.** A Content-Security-Policy meta tag sets
+  `connect-src 'none'; form-action 'none'; default-src 'none'`, so the browser
+  itself blocks any network request (fetch, XHR, beacon, WebSocket, form POST),
+  even if code attempted one. There is also no `<form>` element.
+- **No third parties.** No external scripts, stylesheets, fonts, images,
+  analytics, or CDNs are loaded. The page is fully self-contained.
+- **No indexing/archiving.** `robots: noindex, noarchive` and
+  `referrer: no-referrer` are set.
+- **Field hardening.** Patient, DOB, MRN, and Date fields use `autocomplete`,
+  `autocorrect`, `autocapitalize`, and `spellcheck` off, plus password-manager
+  ignore hints, and are read-only until focused.
+- **Auto-clear.** Patient fields are cleared on reset and on the `pagehide` /
+  `beforeunload` events (navigating away or closing the tab), and via a
+  dedicated "Clear Patient Fields" button.
+
+Patient identifiers therefore exist only transiently in page memory (the DOM)
+for on-screen display and printing, and are gone when the page closes.
+
+### What the application cannot control
+
+Full HIPAA compliance is an organizational determination, not solely a property
+of this software. Items outside the tool's control include:
+
+- **Printing / Save-as-PDF.** If a user prints or saves to PDF, that output file
+  contains the entered data and is the user's responsibility to safeguard.
+- **Operating-system behavior.** OS memory paging/swap, clipboard, and browser
+  process memory are outside any web page's control.
+- **Institutional policy.** Use on a compliant device/network, workforce
+  training, and risk assessment are the responsibility of the covered entity.
+
+This section documents technical safeguards to support a privacy/compliance
+review; it is not a certification of HIPAA compliance.
+
+---
+
+## 12. Worked example
 
 Inputs: Milrinone, 0.5 mcg/kg/min, 100 kg, 48 hr bag change, 0.4 mg/mL.
 
