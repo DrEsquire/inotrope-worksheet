@@ -21,8 +21,8 @@ Compounding a patient-specific or facility-standardized preparation may still be
 considered when:
 
 - **Standardizing dose-change schedules** — aligning bag-change intervals and
-  concentrations across a facility to reduce variation and error at transitions
-  of care.
+  concentrations across a facility or the out-patient setting to reduce variation
+  and error at transitions of care.
 - **CHF fluid restriction** — increasing the drug concentration to reduce the
   infused volume for patients with heart failure or other fluid-restricted
   states, where the volume of a standard premix would be undesirable.
