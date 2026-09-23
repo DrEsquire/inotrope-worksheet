@@ -22,6 +22,12 @@ All computation happens client-side. The page uses no analytics, no cookies, and
 local storage. Patient, DOB, and MRN fields are read-only until focused and are cleared
 when the page is closed or reset.
 
+## Methods &amp; validation
+
+The complete calculation logic, rounding rules, clinical reference ranges, and a
+validated worked example are documented in [METHODS.md](METHODS.md) so any
+pharmacist can independently verify every output.
+
 ## Disclaimer
 
 For use by qualified healthcare professionals. This tool is a calculation aid and does
