@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Free browser-based inotrope (dobutamine, milrinone) IV compounding worksheet for pharmacists. Runs entirely offline; no patient data is stored or uploaded.">
+<title>Inotrope Compounding Worksheet</title>
+<style>
+  :root {
+    --brand: #1f6f8b;
+    --brand-dark: #16505f;
+    --brand-light: #e8f2f5;
+    --accent: #2e8b74;
+    --accent-light: #e6f4ef;
+    --ink: #223038;
+    --muted: #5c6b73;
+    --line: #d7e0e4;
+    --bg: #f2f6f7;
+    --warn-bg: #fff8e6;
+    --warn-line: #e0a800;
+    --danger: #b0322b;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(20,50,60,.08), 0 4px 16px rgba(20,50,60,.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 940px; margin: 0 auto; padding: 20px 18px 48px;
+    background: var(--bg); color: var(--ink); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app-header {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    color: #fff; border-radius: var(--radius); padding: 26px 28px; margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .app-header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.2px; color: #fff; border: none; padding: 0; }
+  .app-header .subtitle { margin: 6px 0 0; font-size: 14px; color: #d6e8ed; font-weight: 400; }
+  .card {
+    background: #fff; padding: 22px 24px; margin-bottom: 18px;
+    border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line);
+  }
+  h1 { color: var(--ink); font-size: 22px; }
+  h2 { color: var(--brand-dark); font-size: 17px; margin: 0 0 12px; font-weight: 650; }
+  .field { margin: 10px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  label { display: inline-block; width: 220px; font-weight: 600; color: var(--muted); font-size: 14px; }
+  input[type="text"], input[type="number"], select {
+    padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; width: 200px;
+    font-size: 14px; background: #fff; color: var(--ink); transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(31,111,139,.15);
+  }
+  input.dose-yes { background-color: var(--accent-light); border-color: var(--accent); }
+  input.dose-no { background-color: #fdecea; border-color: var(--danger); }
+  .result {
+    background: var(--brand-light); padding: 8px 12px; border-radius: 6px; font-weight: 700;
+    min-width: 120px; display: inline-block; color: var(--brand-dark); border: 1px solid #cfe1e7;
+  }
+  .unit { color: var(--muted); font-size: 12px; margin-left: 2px; }
+  .section-title {
+    background: var(--brand); color: #fff; padding: 9px 14px; border-radius: 6px;
+    margin: 16px 0 12px; font-weight: 600; font-size: 14px; letter-spacing: .3px;
+  }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .col { flex: 1; min-width: 280px; }
+  .highlight {
+    background: var(--warn-bg); padding: 12px 14px; border-left: 4px solid var(--warn-line);
+    margin: 12px 0; border-radius: 0 6px 6px 0; font-size: 14px;
+  }
+  button {
+    background: var(--brand); color: #fff; border: none; padding: 11px 22px; border-radius: 6px;
+    cursor: pointer; font-size: 14px; font-weight: 600; margin: 4px 8px 4px 0; transition: background .15s;
+  }
+  button:hover { background: var(--brand-dark); }
+  button.secondary { background: #78888f; }
+  button.secondary:hover { background: #5f6d73; }
+  .usp-section {
+    background: var(--accent-light); padding: 14px 16px; border-radius: var(--radius);
+    margin-bottom: 18px; border: 1px solid #bfe3d8; font-size: 14px; color: var(--brand-dark);
+  }
+  .privacy-notice {
+    font-size: 13px; color: var(--muted); background: #eef3f5; padding: 10px 14px;
+    border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--line);
+  }
+  .patient-field { opacity: 1; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 8px; text-align: left; border: 1px solid var(--line); font-size: 13px; }
+  th { background: var(--brand); color: #fff; }
+  .date-display { font-size: 14px; color: var(--muted); margin-bottom: 15px; }
+  .dose-alert { color: var(--danger); font-weight: 700; }
+  .hidden { display: none; }
+  .radio-group label { margin-right: 14px; font-weight: 400; cursor: pointer; width: auto; }
+  .signature-box { border-bottom: 1px solid #8a999f; height: 34px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: var(--muted); }
+  .highlight-blue { background: var(--brand-light); border: 1px solid #bcd7df; border-radius: var(--radius); padding: 16px; }
+  .highlight-green { background: var(--accent-light); border: 1px solid #bfe3d8; border-radius: var(--radius); padding: 16px; }
+  .app-footer {
+    text-align: center; font-size: 13px; color: var(--muted); margin-top: 28px;
+    padding-top: 18px; border-top: 1px solid var(--line); line-height: 1.7;
+  }
+  .app-footer strong { color: var(--ink); }
+  .app-footer a { color: var(--brand); text-decoration: none; }
+  .app-footer a:hover { text-decoration: underline; }
+  .version-tag { font-size: 11px; color: #9aa8ae; }
+
+  @media (max-width: 640px) {
+    label { width: 100%; }
+    input[type="text"], input[type="number"], select { width: 100%; }
+    .result { width: 100%; }
+    .app-header { padding: 20px; }
+    .app-header h1 { font-size: 21px; }
+    .card { padding: 18px 16px; }
+  }
+
+  @media print {
+    @page { size: letter; margin: 0.55in 0.45in; }
+    body { max-width: 100%; margin: 0; background: #fff; padding: 0; color: #000; }
+    .app-header { background: #fff; color: #000; box-shadow: none; border: 1px solid #999; }
+    .app-header h1, .app-header .subtitle { color: #000; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #bbb; }
+    .highlight-blue, .highlight-green { break-inside: avoid; }
+    .row { flex-wrap: nowrap; }
+    .col { min-width: 0; }
+    button { display: none; }
+    input, select { border: 1px solid #aaa; }
+    .result { background: #f2f2f2; color: #000; }
+  }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <h1>Inotrope Compounding Worksheet</h1>
+  <p class="subtitle">IV dobutamine &amp; milrinone dosing and compounding calculator for pharmacists</p>
+</header>
+
+<div class="card">
+  <p class="privacy-notice">This worksheet runs entirely in your browser. Patient-identifying fields are used for printing only and are <strong>never saved to disk, uploaded, or stored</strong>. Clearing the page or closing the tab removes them.</p>
+
+  <div class="date-display" id="currentDate"></div>
+
+  <div class="field patient-field">
+    <label>Patient:</label>
+    <input type="text" id="patient" autocomplete="off" oninput="calculate()">
+  </div>
+  <div class="field patient-field">
+    <label>Date of Birth:</label>
+    <input type="text" id="dob" autocomplete="off" oninput="calculate()">
+  </div>
+  <div class="field patient-field">
+    <label>MRN:</label>
+    <input type="text" id="mrn" autocomplete="off" oninput="calculate()">
+  </div>
+  <div class="field patient-field">
+    <label>Date:</label>
+    <input type="text" id="date" autocomplete="off" oninput="calculate()">
+  </div>
+
+  <div class="highlight">
+    <strong>Disclaimer:</strong> This is intended for stable adult patients requiring chronic IV dosing. This calculator does not replace the clinical judgement of a qualified prescriber or pharmacist.
+  </div>
+
+  <div class="section-title">Drug Selection</div>
+  <div class="field">
+    <label>Drug:</label>
+    <select id="drug" onchange="drugChanged()" style="padding: 6px; width: 200px;">
+      <option value="dobutamine">Dobutamine</option>
+      <option value="milrinone">Milrinone</option>
+    </select>
+  </div>
+
+  <div class="highlight" id="drugInfo">
+    <strong>Drug:</strong>
+    <span id="drugInfoText"></span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Dosing Parameters</h2>
+  
+  <div class="field">
+    <label>Dose Weight Provided:</label>
+    <span class="radio-group">
+      <label><input type="radio" name="doseWeightProvided" value="yes" onchange="doseWeightModeChanged()" checked> Yes</label>
+      <label><input type="radio" name="doseWeightProvided" value="no" onchange="doseWeightModeChanged()"> No</label>
+    </span>
+  </div>
+
+  <div id="directDoseWeightSection">
+    <div class="field">
+      <label id="directDoseLabel">Hospital Dose:</label>
+      <input type="number" id="dose" step="0.1" oninput="calculate()">
+      <span class="unit" id="directDoseUnit">mcg/kg/min</span>
+      <span id="doseAlert" class="unit" aria-live="polite"></span>
+    </div>
+    
+    <div class="field">
+      <label id="directWeightLabel">Weight:</label>
+      <input type="number" id="weight" step="0.1" oninput="calculate()">
+      <span class="unit" id="directWeightUnit">kg</span>
+    </div>
+  </div>
+
+  <div id="reverseDoseWeightSection" class="hidden">
+    <div class="field">
+      <label id="reverseDoseLabel">Hospital Dose:</label>
+      <input type="number" id="reverseDose" step="0.1" oninput="calculate()">
+      <span class="unit">mcg/kg/min</span>
+    </div>
+    <div class="field">
+      <label id="reverseWeightLabel">Hospital Weight:</label>
+      <input type="number" id="reverseRate" step="0.1" oninput="calculate()">
+      <span class="unit" id="reverseWeightUnit">mL/hr</span>
+    </div>
+    <div class="field">
+      <label>Hospital Concentration:</label>
+      <select id="reverseConc" onchange="calculate()">
+        <option data-drug="dobutamine" value="4">4 mg/mL</option>
+        <option data-drug="dobutamine" value="5">5 mg/mL</option>
+        <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
+        <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
+        <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
+      </select>
+      <span class="unit">mg/mL</span>
+    </div>
+    <div class="field">
+      <label>Calculated Dose Weight:</label>
+      <input type="text" id="resCalculatedWeight_kg" readonly class="result">
+      <span class="unit">kg</span>
+      <input type="text" id="resCalculatedWeight_lb" readonly class="result">
+      <span class="unit">lb</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Bag Change Schedule:</label>
+    <input type="number" id="bagHours" step="1" oninput="calculate()" value="48">
+    <span class="unit">hours</span>
+  </div>
+
+  <div class="field">
+    <label>Standard Concentration:</label>
+    <select id="concentration" onchange="calculate()">
+      <option data-drug="dobutamine" value="4">4 mg/mL</option>
+      <option data-drug="dobutamine" value="5">5 mg/mL</option>
+      <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
+      <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
+      <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
+    </select>
+    <span class="unit">mg/mL</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Results</h2>
+  
+  <div class="row">
+    <div class="col">
+      <div class="field">
+        <label>Dose (mcg/min):</label>
+        <input type="text" id="resDose_mcg_min" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Dose (mg/hr):</label>
+        <input type="text" id="resDose_mg_hr" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Daily Order (mg):</label>
+        <input type="text" id="resDailyOrder" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Calculated BAG (mL):</label>
+        <input type="text" id="resBag_mL" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Rate (mL/hr):</label>
+        <input type="text" id="resRate" readonly class="result">
+      </div>
+    </div>
+    
+    <div class="col">
+      <div class="field">
+        <label>Dose (mg/BAG):</label>
+        <input type="text" id="resDose_mg_bag" readonly class="result">
+      </div>
+      <div class="field">
+        <label>BAG with Overfill (mg):</label>
+        <input type="text" id="resBagOverfill_mg" readonly class="result">
+      </div>
+      <div class="field">
+        <label>BAG with Overfill (mL):</label>
+        <input type="text" id="resBagOverfill_mL" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Minimum Pump Order (mg):</label>
+        <input type="text" id="resMinOrder_mg" readonly class="result">
+      </div>
+      <div class="field">
+        <label>Minimum Pump Order (mL):</label>
+        <input type="text" id="resMinOrder_mL" readonly class="result">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row highlight-green">
+    <div class="col">
+      <h2>Final Compounded Dose</h2>
+      <div class="field">
+        <label><strong>Final Compounded Dose (mg):</strong></label>
+        <input type="text" id="resFinal_mg_pump" readonly class="result"> <span class="unit">mg</span>
+      </div>
+      <div class="field">
+        <label><strong>Final Compounded Dose (mL):</strong></label>
+        <input type="text" id="resFinal_mL_pump" readonly class="result"> <span class="unit">mL</span>
+      </div>
+      <div class="field" style="margin-top: 24px;">
+        <label>Max Time (hr):</label>
+        <input type="text" id="resMaxTime" readonly class="result">
+      </div>
+    </div>
+    <div class="col">
+      <h2>Pump Settings</h2>
+      <div class="field">
+        <label>VOL:</label>
+        <input type="text" id="pumpVol" readonly class="result"> <span class="unit">mL</span>
+      </div>
+      <div class="field">
+        <label>ATBI:</label>
+        <input type="text" id="pumpAtbi" readonly class="result"> <span class="unit">mL</span>
+      </div>
+      <div class="field">
+        <label>RATE:</label>
+        <input type="text" id="pumpRate" readonly class="result"> <span class="unit">mL/hr</span>
+      </div>
+      <div class="field">
+        <label>Max Time:</label>
+        <input type="text" id="pumpTime" readonly class="result"> <span class="unit">HH:MM</span>
+      </div>
+      <div class="field">
+        <label>KVO:</label>
+        <input type="text" id="pumpKvo" readonly class="result"> <span class="unit">mL/hr</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="usp-section">
+  <strong>USP 797 2024 Compliance</strong><br>
+  Category 2 CSP - 4 days room temp | Category 2 CSP - 10 days refrigerated
+</div>
+
+<div class="card">
+  <h2>Signatures</h2>
+  <div class="row">
+    <div class="col">
+      <div class="field">
+        <label>Pharmacist 1:</label>
+        <div class="signature-box">Sign:</div>
+        <input type="text" id="pharmacist" placeholder="Print name" oninput="calculate()">
+      </div>
+    </div>
+    <div class="col">
+      <div class="field">
+        <label>Pharmacist 2 (Verification):</label>
+        <div class="signature-box">Sign:</div>
+        <input type="text" id="pharmacist2" placeholder="Print name" oninput="calculate()">
+      </div>
+    </div>
+  </div>
+</div>
+
+<button onclick="printReport()">Print Results</button>
+<button onclick="clearPatientFields()" class="secondary">Clear Patient Fields</button>
+<button onclick="resetAll()" class="secondary">Reset</button>
+
+<footer class="app-footer">
+  <p><strong>Eric Holmes, PharmD</strong> &mdash; Samford University</p>
+  <p>For use by qualified healthcare professionals. This tool does not replace clinical judgment.<br>
+  All calculations run locally in your browser; no data is transmitted or stored.</p>
+  <p class="version-tag">Inotrope Compounding Worksheet &middot; v1.0 &middot; <a href="https://github.com/DrEsquire/inotrope-worksheet" target="_blank" rel="noopener">source on GitHub</a></p>
+</footer>
+
+<script>
+const drugDefaults = {
+  dobutamine: { options: [4, 5] },
+  milrinone: { options: [0.2, 0.4, 0.8] }
+};
+
+const bagHoursDefaults = { dobutamine: 24, milrinone: 12 };
+
+function setToday() {
+  const today = new Date().toLocaleDateString();
+  const el = document.getElementById('date');
+  const txt = document.getElementById('currentDate');
+  if (el) el.value = today;
+  if (txt) txt.textContent = 'Date: ' + today;
+}
+
+function clearPatientFields() {
+  const rawToday = new Date();
+  const month = String(rawToday.getMonth() + 1).padStart(2, '0');
+  const day = String(rawToday.getDate()).padStart(2, '0');
+  const year = rawToday.getFullYear();
+  const today = month + '/' + day + '/' + year;
+  ['patient', 'dob', 'mrn', 'date'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'date') {
+      el.value = today;
+    } else {
+      el.value = '';
+    }
+  });
+}
+
+function doseWeightModeChanged() {
+  const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
+  const directSection = document.getElementById('directDoseWeightSection');
+  const reverseSection = document.getElementById('reverseDoseWeightSection');
+  if (!directSection || !reverseSection) return;
+  const yes = mode && mode.value === 'yes';
+
+  const directDoseLabel = document.getElementById('directDoseLabel');
+  const directDoseUnit = document.getElementById('directDoseUnit');
+  const directWeightLabel = document.getElementById('directWeightLabel');
+  const directWeightUnit = document.getElementById('directWeightUnit');
+  if (directDoseLabel) directDoseLabel.textContent = 'Hospital Dose:';
+  if (directDoseUnit) directDoseUnit.textContent = 'mcg/kg/min';
+  if (directWeightLabel) directWeightLabel.textContent = yes ? 'Weight:' : 'Hospital Rate:';
+  if (directWeightUnit) directWeightUnit.textContent = 'kg';
+
+  const reverseDoseLabel = document.getElementById('reverseDoseLabel');
+  const reverseWeightLabel = document.getElementById('reverseWeightLabel');
+  if (reverseDoseLabel) reverseDoseLabel.textContent = 'Hospital Dose:';
+  if (reverseWeightLabel) reverseWeightLabel.textContent = 'Hospital Rate:';
+
+  directSection.classList.toggle('hidden', !yes);
+  reverseSection.classList.toggle('hidden', yes);
+  if (!yes) {
+    const drug = document.getElementById('drug');
+    const reverseConcEl = document.getElementById('reverseConc');
+    if (reverseConcEl && drug) {
+      const target = Array.from(reverseConcEl.options).find(option => option.dataset.drug === drug.value);
+      if (target) target.selected = true;
+    }
+  }
+  calculate();
+}
+
+function printReport() {
+  window.print();
+}
+
+function setupPrivacy() {
+  ['patient', 'dob', 'mrn', 'date'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('autocomplete', 'off');
+    el.setAttribute('readonly', 'readonly');
+    el.addEventListener('focus', function() { this.removeAttribute('readonly'); });
+    el.addEventListener('blur', function() { this.setAttribute('readonly', 'readonly'); });
+  });
+  const clearOnHide = clearPatientFields;
+  window.addEventListener('pagehide', clearOnHide);
+  window.addEventListener('beforeunload', clearOnHide);
+}
+
+function resetAll() {
+  ['dose', 'weight', 'reverseDose', 'reverseRate', 'reverseConc', 'concentration', 'patient', 'dob', 'mrn', 'resFinal_mg_pump', 'resFinal_mL_pump'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = id === 'bagHours' ? '48' : '';
+  });
+  const drug = document.getElementById('drug');
+  const concEl = document.getElementById('concentration');
+  if (drug && concEl) {
+    const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
+    if (target) target.selected = true;
+  }
+  const modeRadio = document.querySelector('input[name="doseWeightProvided"][value="yes"]');
+  if (modeRadio) modeRadio.checked = true;
+  doseWeightModeChanged();
+  setToday();
+  calculate();
+}
+
+function round(x, decimals) {
+  decimals = decimals || 1;
+  return x ? Number(x.toFixed(decimals)) : '';
+}
+
+function roundToTenth(value) {
+  if (value === '' || value === null || value === undefined) return '';
+  return Number(Number(value).toFixed(1));
+}
+
+function fmt(n) {
+  if (n === '' || n === null || n === undefined) return '';
+  return Number(n).toFixed(2);
+}
+
+function formatHoursAsHHMM(hours) {
+  if (hours === '' || hours === null || hours === undefined) return '';
+  const totalMinutes = Math.round(Number(hours) * 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+
+function drugChanged() {
+  const drug = document.getElementById('drug');
+  const concEl = document.getElementById('concentration');
+  if (drug && concEl) {
+    Array.from(concEl.options).forEach(option => {
+      option.style.display = option.dataset.drug === drug.value ? '' : 'none';
+    });
+    const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
+    if (target) target.selected = true;
+  }
+  updateDrugInfo();
+  const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
+  if (mode && mode.value === 'no') {
+    const reverseConcEl = document.getElementById('reverseConc');
+    if (reverseConcEl && drug) {
+      const target = Array.from(reverseConcEl.options).find(option => option.dataset.drug === drug.value);
+      if (target) reverseConcEl.value = String(target.value);
+    }
+  }
+  calculate();
+}
+
+function updateDrugInfo() {
+  const drugEl = document.getElementById('drug');
+  const textEl = document.getElementById('drugInfoText');
+  if (!drugEl || !textEl) return;
+  const drug = drugEl.value;
+  let text = '';
+  if (drug === 'dobutamine') {
+    text = 'Dobutamine stock: 12.5 mg/mL vial. Usual bag concentrations: 4 mg/mL or 5 mg/mL.';
+  } else if (drug === 'milrinone') {
+    text = 'Milrinone stock: 1 mg/mL vial. Usual bag concentrations: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL.';
+  }
+  textEl.textContent = text;
+}
+
+function calculate() {
+  try {
+    const drugEl = document.getElementById('drug');
+    const doseEl = document.getElementById('dose');
+    const weightEl = document.getElementById('weight');
+    const bagHoursEl = document.getElementById('bagHours');
+    const concEl = document.getElementById('concentration');
+
+    const doseWeightRadio = document.querySelector('input[name="doseWeightProvided"]:checked');
+    const doseWeightProvided = doseWeightRadio ? doseWeightRadio.value === 'yes' : true;
+
+    const reverseDoseEl = document.getElementById('reverseDose');
+    const reverseRateEl = document.getElementById('reverseRate');
+    const reverseConcEl = document.getElementById('reverseConc');
+
+    let dose_mcg_kg_min = 0;
+    let weight_kg = 0;
+    let bagHours = 0;
+    let conc_mg_ml = 0;
+
+    if (!doseWeightProvided) {
+      const reverseDose = reverseDoseEl ? parseFloat(reverseDoseEl.value) || 0 : 0;
+      const reverseRate = reverseRateEl ? parseFloat(reverseRateEl.value) || 0 : 0;
+      const reverseConc = reverseConcEl ? parseFloat(reverseConcEl.value) || 0 : 0;
+      dose_mcg_kg_min = reverseDose;
+      const concForCalc = concEl ? parseFloat(concEl.value) || reverseConc : reverseConc;
+      bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
+      conc_mg_ml = reverseConc;
+      if (reverseDose) {
+        weight_kg = reverseRate * (reverseConc || concForCalc) / 0.06 / reverseDose;
+      }
+      const weightKgEl = document.getElementById('resCalculatedWeight_kg');
+      const weightLbEl = document.getElementById('resCalculatedWeight_lb');
+      if (weightKgEl) weightKgEl.value = roundToTenth(weight_kg);
+      if (weightLbEl) weightLbEl.value = roundToTenth(weight_kg * 2.20462);
+      if (doseEl) doseEl.value = reverseDoseEl ? reverseDoseEl.value : '';
+      if (weightEl) weightEl.value = roundToTenth(weight_kg);
+    } else {
+      dose_mcg_kg_min = doseEl ? parseFloat(doseEl.value) || 0 : 0;
+      weight_kg = weightEl ? parseFloat(weightEl.value) || 0 : 0;
+      bagHours = bagHoursEl ? parseFloat(bagHoursEl.value) || 0 : 0;
+      conc_mg_ml = concEl ? parseFloat(concEl.value) || 0 : 0;
+      const weightKgEl = document.getElementById('resCalculatedWeight_kg');
+      const weightLbEl = document.getElementById('resCalculatedWeight_lb');
+      if (weightKgEl) weightKgEl.value = '';
+      if (weightLbEl) weightLbEl.value = '';
+    }
+
+    const drug = drugEl ? drugEl.value : '';
+
+    const doseAlertEl = document.getElementById('doseAlert');
+    const doseRanges = {
+      dobutamine: { min: 2, max: 5 },
+      milrinone: { min: 0.125, max: 0.5 }
+    };
+    if (doseAlertEl) {
+      const sourceEl = doseWeightProvided ? doseEl : reverseDoseEl;
+      const value = sourceEl && sourceEl.value !== '' ? parseFloat(sourceEl.value) : NaN;
+      const range = value === value && doseRanges[drug] ? doseRanges[drug] : null;
+      if (range && !Number.isNaN(value)) {
+        if (value < range.min || value > range.max) {
+          doseAlertEl.textContent = 'Outside usual adult range: ' + range.min + '-' + range.max + ' mcg/kg/min';
+          doseAlertEl.className = 'unit dose-alert';
+          if (sourceEl) sourceEl.className = 'dose-no';
+        } else {
+          doseAlertEl.textContent = 'Within usual adult range';
+          doseAlertEl.className = 'unit';
+          if (sourceEl) sourceEl.className = 'dose-yes';
+        }
+      } else if (sourceEl && sourceEl.value === '') {
+        doseAlertEl.textContent = '';
+        doseAlertEl.className = 'unit';
+        if (sourceEl) sourceEl.className = '';
+      }
+    }
+
+    if (!conc_mg_ml && concEl && drugDefaults[drug]) {
+      const target = Array.from(concEl.options).find(option => option.dataset.drug === drug);
+      if (target) target.selected = true;
+    }
+    const conc_mg_ml_final = concEl ? parseFloat(concEl.value) || 0 : 0;
+
+    const dose_mcg_min = dose_mcg_kg_min * weight_kg;
+    const dose_mg_hr = dose_mcg_min * 0.06;
+    const dose_mg_bag = dose_mg_hr * bagHours;
+    const dailyOrder = dose_mg_hr * 24;
+    const bag_calc_mL = conc_mg_ml_final ? dailyOrder / conc_mg_ml_final : (dailyOrder ? '' : '');
+
+    const overfill_factor = 1.15;
+    const bag_mg_with_overfill = dose_mg_bag * overfill_factor;
+    const bag_mL_with_overfill = conc_mg_ml_final ? bag_mg_with_overfill / conc_mg_ml_final : '';
+
+    const rate_ml_hr_exact = conc_mg_ml_final ? dose_mg_hr / conc_mg_ml_final : '';
+    const rate_ml_hr = rate_ml_hr_exact !== '' ? roundToTenth(rate_ml_hr_exact) : '';
+    const minOrder_mL = conc_mg_ml_final && rate_ml_hr_exact !== '' ? rate_ml_hr_exact * (bagHours + 4) : '';
+    const minOrder_mg = minOrder_mL !== '' ? minOrder_mL * conc_mg_ml_final : '';
+
+    function practicalRoundUp(value, increment) {
+      if (value === '' || value === null || value === undefined) return '';
+      if (value === 0) return 0;
+      const times = value / increment;
+      if (times === Math.floor(times)) return value;
+      return (Math.floor(times) + 1) * increment;
+    }
+    function getIncrement(v) {
+      if (v === '' || v === null || v === undefined) return 0;
+      if (v < 50) return 5;
+      if (v < 250) return 10;
+      return 25;
+    }
+    const final_mL = minOrder_mL !== '' ? practicalRoundUp(minOrder_mL, getIncrement(minOrder_mL)) : '';
+    const final_mg = final_mL !== '' ? practicalRoundUp(final_mL * conc_mg_ml_final, getIncrement(final_mL * conc_mg_ml_final)) : '';
+
+    const maxMinutes = (final_mL && rate_ml_hr_exact) ? Math.round((final_mL / rate_ml_hr_exact) * 60) : '';
+    const maxHours = maxMinutes !== '' ? Math.floor(maxMinutes / 60) : '';
+    const maxMins = maxMinutes !== '' ? maxMinutes % 60 : '';
+    const maxTime = maxMinutes !== '' ? String(maxHours).padStart(2, '0') + ':' + String(maxMins).padStart(2, '0') : '';
+
+    const pumpVol = final_mL || minOrder_mL;
+    const pumpAtbi = minOrder_mL;
+    const pumpRate = rate_ml_hr;
+    const pumpTime = bagHours;
+    const pumpKvo = rate_ml_hr;
+
+    if (document.getElementById('resBag_mL')) document.getElementById('resBag_mL').value = roundToTenth(bag_calc_mL);
+    if (document.getElementById('resDose_mcg_min')) document.getElementById('resDose_mcg_min').value = roundToTenth(dose_mcg_min);
+    if (document.getElementById('resDose_mg_hr')) document.getElementById('resDose_mg_hr').value = roundToTenth(dose_mg_hr);
+    if (document.getElementById('resDailyOrder')) document.getElementById('resDailyOrder').value = roundToTenth(dailyOrder);
+    if (document.getElementById('resDose_mg_bag')) document.getElementById('resDose_mg_bag').value = roundToTenth(dose_mg_bag);
+    if (document.getElementById('resBagOverfill_mg')) document.getElementById('resBagOverfill_mg').value = roundToTenth(bag_mg_with_overfill);
+    if (document.getElementById('resBagOverfill_mL')) document.getElementById('resBagOverfill_mL').value = roundToTenth(bag_mL_with_overfill);
+    if (document.getElementById('resMinOrder_mg')) document.getElementById('resMinOrder_mg').value = roundToTenth(minOrder_mg);
+    if (document.getElementById('resMinOrder_mL')) document.getElementById('resMinOrder_mL').value = roundToTenth(minOrder_mL);
+    if (document.getElementById('resFinal_mg_pump')) document.getElementById('resFinal_mg_pump').value = roundToTenth(final_mg);
+    if (document.getElementById('resFinal_mL_pump')) document.getElementById('resFinal_mL_pump').value = roundToTenth(final_mL);
+    if (document.getElementById('resMaxTime')) document.getElementById('resMaxTime').value = maxTime;
+    if (document.getElementById('resRate')) document.getElementById('resRate').value = roundToTenth(pumpRate);
+    if (document.getElementById('pumpVol')) document.getElementById('pumpVol').value = roundToTenth(pumpVol);
+    if (document.getElementById('pumpAtbi')) document.getElementById('pumpAtbi').value = roundToTenth(pumpAtbi);
+    if (document.getElementById('pumpRate')) document.getElementById('pumpRate').value = roundToTenth(pumpRate);
+    if (document.getElementById('pumpTime')) document.getElementById('pumpTime').value = formatHoursAsHHMM(pumpTime);
+    if (document.getElementById('pumpKvo')) document.getElementById('pumpKvo').value = roundToTenth(pumpKvo);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+setupPrivacy();
+setToday();
+drugChanged();
+</script>
+
+</body>
+</html>
