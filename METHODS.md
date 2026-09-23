@@ -11,6 +11,27 @@ specification of the tool's behavior.
 
 ---
 
+## Clinical context: when to compound
+
+Commercially prepared, premixed inotrope products (dobutamine, milrinone,
+dopamine) are available and are appropriate for many patients. This worksheet is
+not intended to replace those products where they meet the clinical need.
+
+Compounding a patient-specific or facility-standardized preparation may still be
+considered when:
+
+- **Standardizing dose-change schedules** — aligning bag-change intervals and
+  concentrations across a facility to reduce variation and error at transitions
+  of care.
+- **CHF fluid restriction** — increasing the drug concentration to reduce the
+  infused volume for patients with heart failure or other fluid-restricted
+  states, where the volume of a standard premix would be undesirable.
+
+The decision to compound rather than use a commercial product rests with the
+prescriber and pharmacist and should follow institutional policy and USP &lt;797&gt;.
+
+---
+
 ## 1. Inputs
 
 | Input | Units | Notes |
