@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Free browser-based inotrope (dobutamine, milrinone) IV compounding worksheet for pharmacists. Runs entirely offline; no patient data is stored or uploaded.">
+<meta name="description" content="Free browser-based inotrope (dobutamine, milrinone, dopamine) IV compounding worksheet for pharmacists. Runs entirely offline; no patient data is stored or uploaded.">
 <title>Inotrope Compounding Worksheet</title>
 <style>
   :root {
@@ -94,6 +94,13 @@
   .signature-box { border-bottom: 1px solid #8a999f; height: 34px; margin-bottom: 6px; padding: 4px 2px; font-size: 13px; color: var(--muted); }
   .highlight-blue { background: var(--brand-light); border: 1px solid #bcd7df; border-radius: var(--radius); padding: 16px; }
   .highlight-green { background: var(--accent-light); border: 1px solid #bfe3d8; border-radius: var(--radius); padding: 16px; }
+  .acute-banner {
+    background: #fdecea; border-left: 5px solid var(--danger);
+  }
+  .acute-warning {
+    display: block; color: var(--danger); font-weight: 800; font-size: 15px;
+    letter-spacing: .3px; margin-bottom: 6px; text-transform: uppercase;
+  }
   .app-footer {
     text-align: center; font-size: 13px; color: var(--muted); margin-top: 28px;
     padding-top: 18px; border-top: 1px solid var(--line); line-height: 1.7;
@@ -165,6 +172,7 @@
     <select id="drug" onchange="drugChanged()" style="padding: 6px; width: 200px;">
       <option value="dobutamine">Dobutamine</option>
       <option value="milrinone">Milrinone</option>
+      <option value="dopamine">Dopamine</option>
     </select>
   </div>
 
@@ -219,6 +227,8 @@
         <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
         <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
         <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
+        <option data-drug="dopamine" value="40">40 mg/mL</option>
+        <option data-drug="dopamine" value="80">80 mg/mL</option>
       </select>
       <span class="unit">mg/mL</span>
     </div>
@@ -245,6 +255,8 @@
       <option data-drug="milrinone" value="0.2">0.2 mg/mL</option>
       <option data-drug="milrinone" value="0.4">0.4 mg/mL</option>
       <option data-drug="milrinone" value="0.8">0.8 mg/mL</option>
+      <option data-drug="dopamine" value="40">40 mg/mL</option>
+      <option data-drug="dopamine" value="80">80 mg/mL</option>
     </select>
     <span class="unit">mg/mL</span>
   </div>
@@ -384,10 +396,11 @@
 <script>
 const drugDefaults = {
   dobutamine: { options: [4, 5] },
-  milrinone: { options: [0.2, 0.4, 0.8] }
+  milrinone: { options: [0.2, 0.4, 0.8] },
+  dopamine: { options: [40, 80] }
 };
 
-const bagHoursDefaults = { dobutamine: 24, milrinone: 12 };
+const bagHoursDefaults = { dobutamine: 24, milrinone: 12, dopamine: 24 };
 
 function setToday() {
   const today = new Date().toLocaleDateString();
@@ -533,15 +546,22 @@ function drugChanged() {
 function updateDrugInfo() {
   const drugEl = document.getElementById('drug');
   const textEl = document.getElementById('drugInfoText');
+  const bannerEl = document.getElementById('drugInfo');
   if (!drugEl || !textEl) return;
   const drug = drugEl.value;
-  let text = '';
+  let html = '';
+  let acute = false;
   if (drug === 'dobutamine') {
-    text = 'Dobutamine stock: 12.5 mg/mL vial. Usual bag concentrations: 4 mg/mL or 5 mg/mL.';
+    html = 'Dobutamine stock: 12.5 mg/mL vial. Usual bag concentrations: 4 mg/mL or 5 mg/mL.';
   } else if (drug === 'milrinone') {
-    text = 'Milrinone stock: 1 mg/mL vial. Usual bag concentrations: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL.';
+    html = 'Milrinone stock: 1 mg/mL vial. Usual bag concentrations: 0.2 mg/mL, 0.4 mg/mL, or 0.8 mg/mL.';
+  } else if (drug === 'dopamine') {
+    html = '<span class="acute-warning">\u26A0 DOPAMINE IS RESERVED FOR THE ACUTE CARE SETTING</span>'
+         + 'Dopamine stock: 40 mg/mL or 80 mg/mL vial. Usual bag concentrations: 40 mg/mL or 80 mg/mL. Usual dose range: 2\u201320 mcg/kg/min.';
+    acute = true;
   }
-  textEl.textContent = text;
+  textEl.innerHTML = html;
+  if (bannerEl) bannerEl.classList.toggle('acute-banner', acute);
 }
 
 function calculate() {
@@ -597,7 +617,8 @@ function calculate() {
     const doseAlertEl = document.getElementById('doseAlert');
     const doseRanges = {
       dobutamine: { min: 2, max: 5 },
-      milrinone: { min: 0.125, max: 0.5 }
+      milrinone: { min: 0.125, max: 0.5 },
+      dopamine: { min: 2, max: 20 }
     };
     if (doseAlertEl) {
       const sourceEl = doseWeightProvided ? doseEl : reverseDoseEl;
