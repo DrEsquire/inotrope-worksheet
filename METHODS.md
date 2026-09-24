@@ -132,20 +132,26 @@ Minimum Pump Order (mg) = Minimum Pump Order (mL) × conc
 
 The minimum pump order volume is rounded **up** to a practical compounding
 increment so the compounded product is easy to prepare and check. The final mg
-is then rounded up on the same increment scale.
+is then derived from that rounded volume.
 
-### Increment scale
+### Increment scale (applied to volume only)
 
-| Value (mL or mg) | Round-up increment |
-|------------------|--------------------|
+| Volume (mL) | Round-up increment |
+|-------------|--------------------|
 | < 50 | 5 |
 | 50 – < 250 | 10 |
 | ≥ 250 | 25 |
 
 ```
 Final Compounded Dose (mL) = roundUp(Minimum Pump Order mL, increment(mL))
-Final Compounded Dose (mg) = roundUp(Final mL × conc, increment(mg))
+Final Compounded Dose (mg) = Final mL × standard concentration   (rounded to 0.1 mg)
 ```
+
+**Only the volume is rounded to a compoundable increment.** The final drug amount
+is then derived as `volume × standard concentration`, so the final compounded
+concentration always exactly equals the selected standard concentration. (The mg
+value is never rounded independently, which would otherwise let the final
+concentration drift away from the standard.)
 
 `roundUp(value, inc)` returns `value` unchanged if it is already an exact
 multiple of `inc`; otherwise it returns the next multiple of `inc`.
@@ -262,7 +268,7 @@ Inputs: Milrinone, 0.5 mcg/kg/min, 100 kg, 48 hr bag change, 0.4 mg/mL.
 | Min pump order (mL) | 7.5 × (48 + 4) | 390 |
 | Min pump order (mg) | 390 × 0.4 | 156 |
 | Final compounded (mL) | roundUp(390, 25) | 400 |
-| Final compounded (mg) | roundUp(400 × 0.4, 10) | 160 |
+| Final compounded (mg) | 400 × 0.4 | 160 |
 | Max Time | 400 ÷ 7.5 × 60 min | 53:20 |
 
 Pump settings: **VOL** 400 mL, **ATBI** 390 mL, **RATE** 7.5 mL/hr, **KVO** 7.5 mL/hr.

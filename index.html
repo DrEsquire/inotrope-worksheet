@@ -730,7 +730,9 @@ function calculate() {
       return 25;
     }
     const final_mL = minOrder_mL !== '' ? practicalRoundUp(minOrder_mL, getIncrement(minOrder_mL)) : '';
-    const final_mg = final_mL !== '' ? practicalRoundUp(final_mL * conc_mg_ml_final, getIncrement(final_mL * conc_mg_ml_final)) : '';
+    // Final mg is derived directly from the rounded volume so the final
+    // concentration always equals the selected standard concentration.
+    const final_mg = final_mL !== '' ? roundToTenth(final_mL * conc_mg_ml_final) : '';
 
     const maxMinutes = (final_mL && rate_ml_hr_exact) ? Math.round((final_mL / rate_ml_hr_exact) * 60) : '';
     const maxHours = maxMinutes !== '' ? Math.floor(maxMinutes / 60) : '';
