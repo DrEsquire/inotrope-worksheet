@@ -1,7 +1,7 @@
 // Inotrope Compounding Worksheet — service worker
 // Provides offline support by caching the app shell (same-origin only).
 // No external resources are ever fetched or stored.
-const VERSION = "inotrope-v2";
+const VERSION = "inotrope-v3";
 const APP_SHELL = [
   "./",
   "./index.html",

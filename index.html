@@ -550,15 +550,10 @@ function resetAll() {
     if (!el) return;
     el.value = id === 'bagHours' ? '48' : '';
   });
-  const drug = document.getElementById('drug');
-  const concEl = document.getElementById('concentration');
-  if (drug && concEl) {
-    const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
-    if (target) target.selected = true;
-  }
   const modeRadio = document.querySelector('input[name="doseWeightProvided"][value="yes"]');
   if (modeRadio) modeRadio.checked = true;
   doseWeightModeChanged();
+  drugChanged();
   setToday();
   calculate();
 }
@@ -586,25 +581,29 @@ function formatHoursAsHHMM(hours) {
   return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
 }
 
+function rebuildConcOptions(selectEl, drugName) {
+  if (!selectEl) return;
+  const opts = (drugDefaults[drugName] && drugDefaults[drugName].options) || [];
+  selectEl.innerHTML = '';
+  opts.forEach(v => {
+    const o = document.createElement('option');
+    o.dataset.drug = drugName;
+    o.value = String(v);
+    o.textContent = v + ' mg/mL';
+    selectEl.appendChild(o);
+  });
+  if (selectEl.options.length) selectEl.selectedIndex = 0;
+}
+
 function drugChanged() {
   const drug = document.getElementById('drug');
-  const concEl = document.getElementById('concentration');
-  if (drug && concEl) {
-    Array.from(concEl.options).forEach(option => {
-      option.style.display = option.dataset.drug === drug.value ? '' : 'none';
-    });
-    const target = Array.from(concEl.options).find(option => option.dataset.drug === drug.value);
-    if (target) target.selected = true;
-  }
+  if (!drug) return;
+  // Rebuild both concentration dropdowns so only the selected drug's standard
+  // concentrations appear. (Rebuilding is reliable across all browsers, unlike
+  // hiding <option>s with display:none, which Safari/iOS ignore.)
+  rebuildConcOptions(document.getElementById('concentration'), drug.value);
+  rebuildConcOptions(document.getElementById('reverseConc'), drug.value);
   updateDrugInfo();
-  const mode = document.querySelector('input[name="doseWeightProvided"]:checked');
-  if (mode && mode.value === 'no') {
-    const reverseConcEl = document.getElementById('reverseConc');
-    if (reverseConcEl && drug) {
-      const target = Array.from(reverseConcEl.options).find(option => option.dataset.drug === drug.value);
-      if (target) reverseConcEl.value = String(target.value);
-    }
-  }
   calculate();
 }
 
