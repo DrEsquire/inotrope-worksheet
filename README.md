@@ -15,6 +15,7 @@ account, and no patient data is ever stored or transmitted.
 - USP <797> 2024 beyond-use dating reference
 - Print-friendly worksheet with pharmacist signature lines
 - Patient-identifying fields are print-only and auto-cleared — never saved or uploaded
+- Installable PWA: works fully offline and can be added to a phone home screen or desktop
 
 ## Privacy
 
