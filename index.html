@@ -750,7 +750,11 @@ function calculate() {
     const maxTime = maxMinutes !== '' ? String(maxHours).padStart(2, '0') + ':' + String(maxMins).padStart(2, '0') : '';
 
     const pumpVol = final_mL || minOrder_mL;
-    const pumpAtbi = minOrder_mL;
+    // ATBI = Amount To Be Infused over the bag duration, using the programmed
+    // (displayed) rate, rounded UP to the next whole mL. No overfill buffer:
+    // the +4hr buffer lives only in the final compounded volume (the bag made).
+    const atbi_exact = (rate_ml_hr !== '' && bagHours) ? rate_ml_hr * bagHours : '';
+    const pumpAtbi = atbi_exact !== '' ? Math.ceil(atbi_exact) : '';
     const pumpRate = rate_ml_hr;
     const pumpTime = bagHours;
     const pumpKvo = rate_ml_hr;

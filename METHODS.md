@@ -175,7 +175,7 @@ rate.
 | Field | Value | Meaning |
 |-------|-------|---------|
 | VOL | Final Compounded Dose (mL) | Total volume to be infused |
-| ATBI | Minimum Pump Order (mL) | Minimum (bag interval + 4 hr buffer) volume |
+| ATBI | Amount To Be Infused (mL) | Programmed rate × bag interval, rounded up to the next whole mL (no overfill buffer) |
 | RATE | Rate (mL/hr) | Infusion rate |
 | Max Time | bag change schedule, HH:MM | Programmed run time |
 | KVO | Rate (mL/hr) | Keep-vein-open rate (= infusion rate) |
@@ -269,9 +269,10 @@ Inputs: Milrinone, 0.5 mcg/kg/min, 100 kg, 48 hr bag change, 0.4 mg/mL.
 | Min pump order (mg) | 390 × 0.4 | 156 |
 | Final compounded (mL) | roundUp(390, 25) | 400 |
 | Final compounded (mg) | 400 × 0.4 | 160 |
+| ATBI (mL) | roundUp(7.5 × 48) | 360 |
 | Max Time | 400 ÷ 7.5 × 60 min | 53:20 |
 
-Pump settings: **VOL** 400 mL, **ATBI** 390 mL, **RATE** 7.5 mL/hr, **KVO** 7.5 mL/hr.
+Pump settings: **VOL** 400 mL, **ATBI** 360 mL, **RATE** 7.5 mL/hr, **KVO** 7.5 mL/hr.
 
 ---
 
