@@ -1,7 +1,10 @@
 // Inotrope Compounding Worksheet — service worker
 // Provides offline support by caching the app shell (same-origin only).
 // No external resources are ever fetched or stored.
-const VERSION = "inotrope-v4";
+// Update model: a new worker installs in the background and WAITS; the page
+// shows an "update available" banner and only activates the new version when
+// the user clicks "Reload to update" (SKIP_WAITING message below).
+const VERSION = "inotrope-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -15,7 +18,7 @@ const APP_SHELL = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(VERSION).then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    // NOTE: no skipWaiting() here — activation is user-triggered via banner.
   );
 });
 
@@ -25,6 +28,13 @@ self.addEventListener("activate", (event) => {
       Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
+});
+
+// The page asks us to take over only when the user clicks "Reload to update".
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 // Cache-first for same-origin GET; network fallback. Never touch cross-origin.

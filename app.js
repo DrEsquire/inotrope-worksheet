@@ -1,12 +1,62 @@
-// Page-side PWA wiring: register the service worker and handle installation.
-// Nothing here transmits data; the service worker only caches same-origin files.
+// Page-side PWA wiring: register the service worker, handle installation,
+// and surface update prompts. Nothing here transmits data; the service
+// worker only caches same-origin files.
 (function () {
+  var bannerShown = false;
+
+  function showUpdateBanner() {
+    if (bannerShown) return;
+    bannerShown = true;
+    var el = document.getElementById("updateBanner");
+    if (el) el.classList.remove("hidden");
+  }
+
+  function hideUpdateBanner() {
+    var el = document.getElementById("updateBanner");
+    if (el) el.classList.add("hidden");
+  }
+
+  window.hideUpdateBanner = hideUpdateBanner;
+
+  window.applyUpdate = function () {
+    if (!navigator.serviceWorker) { location.reload(); return; }
+    navigator.serviceWorker.getRegistration().then(function (reg) {
+      if (!reg || !reg.waiting) { location.reload(); return; }
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        // The new worker has taken over: reload once onto the fresh files.
+        if (window.__reloadedForUpdate) return;
+        window.__reloadedForUpdate = true;
+        location.reload();
+      });
+      reg.waiting.postMessage({ type: "SKIP_WAITING" });
+    });
+  };
+
+  function watchForWaiting(reg) {
+    if (reg && reg.waiting) showUpdateBanner();
+    reg.addEventListener("updatefound", function () {
+      var installing = reg.installing;
+      if (!installing) return;
+      installing.addEventListener("statechange", function () {
+        if (installing.state === "installed" && navigator.serviceWorker.controller) {
+          // A new version finished installing while an old one was in control.
+          showUpdateBanner();
+        }
+      });
+    });
+  }
+
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("sw.js").catch(function (err) {
+      navigator.serviceWorker.register("sw.js").then(function (reg) {
+        watchForWaiting(reg);
+        // Don't wait for the browser's ~24h poll: check for a new worker now.
+        return reg.update();
+      }).catch(function (err) {
         // Offline support simply won't activate; app still works online.
         console.warn("Service worker registration failed:", err);
       });
+      navigator.serviceWorker.ready.then(watchForWaiting);
     });
   }
 

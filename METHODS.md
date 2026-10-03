@@ -278,6 +278,16 @@ Pump settings: **VOL** 400 mL, **ATBI** 360 mL, **RATE** 7.5 mL/hr, **KVO** 7.5 
 
 ## Disclaimer
 
+This application is a reference aid for qualified healthcare professionals.
+It is **not a medical device** and has **not been reviewed or approved by the
+U.S. Food and Drug Administration**. Nothing in this tool replaces the clinical
+judgment of a qualified prescriber or pharmacist.
+
+Every calculated value shown by this tool — doses, volumes, concentrations,
+pump parameters — must be **independently verified by a licensed professional
+before compounding or administration**. The authors assume no liability for
+use or misuse of this tool.
+
 These methods are provided for transparency and independent verification. The
 tool is a calculation aid for qualified healthcare professionals and does not
 replace the clinical judgment of a licensed prescriber or pharmacist. Verify all
